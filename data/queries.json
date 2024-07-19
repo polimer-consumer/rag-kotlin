@@ -1,0 +1,19 @@
+[
+  {
+    "question": "What is ClosedSendChannelException? Why it can be thrown?",
+    "chunk": "class ClosedSendChannelException(message: String?) : IllegalStateException(source)  \nIndicates an attempt to send to a isClosedForSend channel that was closed without a cause. A failed channel rethrows the original close cause exception on send attempts.  \nThis exception is a subclass of IllegalStateException, because, conceptually, it is the sender's responsibility to close the channel and not try to send anything thereafter. Attempts to send to a closed channel indicate a logical error in the sender's code.",
+    "metadata": {
+      "Topic": "ClosedSendChannelException"
+    }
+  },
+  {
+    "question": "Tell me about updateAndGet method for coroutines flow",
+    "chunk": "updateAndGet  \ninline fun <T> MutableStateFlow<T>.updateAndGet(function: (T) -> T): T(source)  \nUpdates the MutableStateFlow.value atomically using the specified function of its value, and returns the new value.  \nfunction may be evaluated multiple times, if value is being concurrently updated.",
+    "metadata": {}
+  },
+  {
+    "question": "What obSubscription method for coroutines flow returns?",
+    "chunk": "onSubscription  \nfun <T> SharedFlow<T>.onSubscription(action: suspend FlowCollector<T>.() -> Unit): SharedFlow<T>(source)  \nReturns a flow that invokes the given action after this shared flow starts to be collected (after the subscription is registered).  \nThe action is called before any value is emitted from the upstream flow to this subscription but after the subscription is established. It is guaranteed that all emissions to the upstream flow that happen inside or immediately after this onSubscription action will be collected by this subscription.",
+    "metadata": {}
+  }
+]

@@ -1,0 +1,8 @@
+[
+  {
+    "question": "What is ClosedSendChannelException? Why it can be thrown?",
+    "context": "class ClosedSendChannelException(message: String?) : IllegalStateException(source)  \nIndicates an attempt to send to a isClosedForSend channel that was closed without a cause. A failed channel rethrows the original close cause exception on send attempts.  \nThis exception is a subclass of IllegalStateException, because, conceptually, it is the sender's responsibility to close the channel and not try to send anything thereafter. Attempts to send to a closed channel indicate a logical error in the sender's code.",
+    "metadata": {
+      "Topic": "ClosedSendChannelException"
+    },
+    "answer": 

@@ -16,18 +16,15 @@ html_splitter = HTMLHeaderTextSplitter(headers_to_split_on)
 
 # Fot test
 initial_links = {
-    "https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.channels/-channel/is"
-    "-closed-for-send.html",
-    "https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.channels/-closed"
-    "-receive-channel-exception/index.html",
+    "https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/on-subscription.html",
+    "https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/update-and-get.html",
     "https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.channels/-closed-send"
     "-channel-exception/index.html",
     "https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.channels/-conflated"
     "-broadcast-channel/index.html",
     "https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.channels/-conflated"
     "-broadcast-channel/open-subscription.html",
-    "https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.channels/-conflated"
-    "-broadcast-channel/value.html"
+    "https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.sync/-semaphore.html"
     }
 
 # Uncomment when will need to parse everything
@@ -67,7 +64,7 @@ for link in initial_links:
 
         html_header_splits = html_splitter.split_text(main_html)
 
-        chunk_size = 500
+        chunk_size = 600
         chunk_overlap = 100
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=chunk_size, chunk_overlap=chunk_overlap
