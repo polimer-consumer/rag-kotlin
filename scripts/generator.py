@@ -1,4 +1,6 @@
 import os
+from pprint import pprint
+
 from openai import OpenAI
 import json
 
@@ -12,6 +14,7 @@ queries = json.load(open('../data/queries.json', 'r', encoding='utf-8'))
 def query_openai_api(question, context):
     prompt = f"I have a question about Kotlin: {question}\nContext: {context}"
     completion = client.chat.completions.create(
+        max_tokens=200,
         model="gpt-4o-mini",
         messages=[
             {"role": "system",
@@ -34,10 +37,8 @@ for query in queries:
         "question": question,
         "context": chunk,
         "metadata": metadata,
-        "answer": answer
+        "answer": answer.content
     }
+    pprint(result)
     results.append(result)
 
-with open('../results/query_results.json', 'w', encoding='utf-8') as file:
-    for result in results:
-        file.write(json.dumps(result) + "\n")

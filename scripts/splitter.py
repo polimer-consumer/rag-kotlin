@@ -2,7 +2,7 @@ import json
 from bs4 import BeautifulSoup
 from langchain_text_splitters import HTMLHeaderTextSplitter, RecursiveCharacterTextSplitter
 
-from scripts.link_fetch import fetch_page
+from link_fetch import fetch_page
 
 headers_to_split_on = [
     ("h1", "Topic"),
@@ -14,18 +14,22 @@ splits_list = []
 
 html_splitter = HTMLHeaderTextSplitter(headers_to_split_on)
 
+lines = []
+line_num = 16
+try:
+    with open('../data/test_links.txt', 'r') as file:
+        for i in range(line_num):
+            line = file.readline()
+            if not line:
+                break
+            lines.append(line.strip())
+except FileNotFoundError:
+    print(f"The file does not exist.")
+except Exception as e:
+    print(f"An error occurred: {e}")
+
 # Fot test
-initial_links = {
-    "https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/on-subscription.html",
-    "https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/update-and-get.html",
-    "https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.channels/-closed-send"
-    "-channel-exception/index.html",
-    "https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.channels/-conflated"
-    "-broadcast-channel/index.html",
-    "https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.channels/-conflated"
-    "-broadcast-channel/open-subscription.html",
-    "https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.sync/-semaphore.html"
-    }
+initial_links = lines
 
 # Uncomment when will need to parse everything
 # with open('../data/table_row_links.txt', 'r', encoding='utf-8') as file:
@@ -64,15 +68,18 @@ for link in initial_links:
 
         html_header_splits = html_splitter.split_text(main_html)
 
-        chunk_size = 600
-        chunk_overlap = 100
+        chunk_size = 150
+        chunk_overlap = 40
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=chunk_size, chunk_overlap=chunk_overlap
         )
 
         splits = text_splitter.split_documents(html_header_splits)
         for split in splits:
-            splits_list.append({"chunk": split.page_content, "metadata": split.metadata})
+            metadata = split.metadata
+            if not metadata:
+                metadata = {"Topic": link}
+            splits_list.append({"chunk": split.page_content, "metadata": metadata})
 
 with open('../data/splits.json', 'w', encoding='utf-8') as file:
     json.dump(splits_list, file)
