@@ -1,39 +1,39 @@
 {
     "question": [
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        ""
+        "Which arguments can CoroutineContext.cancel take?",
+        "What happens if I invoke completeWith subsequently?",
+        "How coroutineScope inherits its context?",
+        "What does currentCoroutineContext return?",
+        "What happens on Delay cancellation?",
+        "On what ensureActive can be called?",
+        "What does ensurePresent do?",
+        "What does invoke do?",
+        "Is coroutineContext.isActive the same as get(Job)?.isActive ?: true",
+        "What does isPresent function return value means?",
+        "Can I call CoroutineContext.job at any time?",
+        "On what joinAll can be called?",
+        "What happens if I have uncaught exception coroutine, launched via launch function",
+        "What dispatcher does CoroutineScope.newCoroutineContext install by default?",
+        "What happens if I use newFixedThreadPoolContext and resulting dispatcher is closed and attempt to submit a continuation task is made",
+        "Which annotations does newSingleThreadContext have?"
     ],
     "answer": [
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        ""
+        "The `CoroutineContext.cancel` function can take one argument:\n\n1. `cause: CancellationException? = null`: This is an optional parameter that can be used to specify a cancellation cause as a `CancellationException`. It can be used to provide additional details on the reason for cancellation.\n\nIn summary, the function signature is:\n```kotlin\nfun CoroutineContext.cancel(cause: CancellationException? = null)\n```\nIf `cause` is not provided, it defaults to `null`.",
+        "When you invoke `completeWith` on a `CompletableDeferred<T>` instance that has already been completed, the subsequent invocations will have no effect and will return `false`. \n\nThis means that if you call `completeWith` multiple times on the same instance after it is already completed (either successfully or exceptionally), only the first call will actually complete the deferred, and all subsequent calls will simply return `false`. The internal state of the `CompletableDeferred` remains unchanged after the first successful completion.",
+        "In Kotlin, `coroutineScope` inherits its context from the outer coroutine context where it is called. It does this by creating a new `CoroutineScope` that uses the outer context's `coroutineContext` while establishing a new `Job` as its parent. This means that the newly created scope shares the context elements from the outer scope, such as dispatcher, exception handler, and other coroutine context elements, but also manages its lifecycle based on the outcome of the suspend block being executed within it.\n\nWhen the block of code within `coroutineScope` is executed, it runs in this new scope, and if any child coroutine fails or the parent coroutine is cancelled, all corresponding child coroutines will also be cancelled, ensuring proper management of concurrency",
+        "The function `currentCoroutineContext()` returns the `CoroutineContext` of the current coroutine. It is an inline suspend function that retrieves the context using `kotlin.coroutines.coroutineContext`. This function serves as an alias to help differentiate it from `CoroutineScope.coroutineContext` when dealing with coroutine contexts in a receiver position.",
+        "When using `delay` in Kotlin coroutines, if the coroutine is cancelled while it is waiting, the following happens:\n\n1. **Cancellation Detection**: The `delay` function is cancellable. If the Job of the coroutine is cancelled during the waiting period, `delay` immediately resumes with a `CancellationException`.\n\n2. **Prompt Cancellation Guarantee**: Even if the cancellation occurs just before the delay would complete (that is, if the coroutine is ready to return the result), it will still throw a `CancellationException` instead of completing normally.\n\n3. **Return Behavior**: If `timeMillis` or `duration` is non-positive, `delay` returns immediately without waiting.\n\n4. **Usage of awaitCancellation**: If you",
+        "`ensureActive` can be called in the following contexts:\n\n1. **CoroutineScope**: You can call `ensureActive` on a `CoroutineScope` instance. This checks if the coroutine scope is still active (not cancelled). If it is not active, a `CancellationException` is thrown.\n\n   ```kotlin\n   coroutineScope.ensureActive()\n   ```\n\n2. **Job**: You can also call `ensureActive` on a `Job` directly. This checks if the specific job associated with a coroutine is active.\n\n   ```kotlin\n   job.ensureActive()\n   ```\n\n3. **CoroutineContext**: You can invoke `ensureActive` on the `CoroutineContext`. This will check for an associated `Job",
+        "`ensurePresent` is an extension function in Kotlin for `ThreadLocal` that checks if the current thread-local value is present in the coroutine context. If the value is not present, it throws an `IllegalStateException`. This function is useful for ensuring that required thread-local values are properly set when using coroutines, helping to avoid issues with stale values and ensuring strict invariants in larger codebases. It serves as a validation step to confirm that the necessary context is present before proceeding with execution.",
+        "In Kotlin, the `invoke` function is defined as an operator function that allows an instance of a class (in this case, `CoroutineDispatcher`) to be called like a function. \n\nIn the context you've provided, when you call a `CoroutineDispatcher` instance with a suspending block, it uses the `invoke` function to execute that block within the context of the dispatcher. Specifically, it switches the Coroutine context to the specified `CoroutineDispatcher`, runs the provided suspending block, suspends until the block completes, and then returns the result.\n\nHere's a breakdown of its components:\n\n- **inline**: The function is inlined at the call site to avoid overhead of function calls.\n- **suspend**: It can be suspended,",
+        "Yes, `coroutineContext.isActive` is functionally equivalent to `get(Job)?.isActive ?: true`. \n\n- `coroutineContext.isActive` checks if the current coroutine's `Job` is active, returning `true` if there is no `Job` in the context.\n- `get(Job)?.isActive ?: true` explicitly retrieves the `Job` from the context and checks its active state, falling back to `true` if no `Job` is present.\n\nBoth expressions serve the same purpose of determining if the coroutine is still active, and can be used interchangeably in your code.",
+        "In Kotlin, the `isPresent` function checks whether a ThreadLocal variable is currently present in the coroutine context. It returns a Boolean value:\n\n- **true**: Indicates that the ThreadLocal variable is present in the coroutine context, meaning it was added using `asContextElement`.\n- **false**: Indicates that the ThreadLocal variable is not present in the coroutine context. \n\nThis function helps to determine if a specific ThreadLocal context has been established for the coroutine execution.",
+        "No, you cannot call `CoroutineContext.job` at any time without ensuring that a `Job` is present in the coroutine context. If the `CoroutineContext` does not have a `Job` instance, calling `job` will throw an `IllegalStateException`. To safely retrieve the `Job`, you should check first:\n\n```kotlin\nval job = coroutineContext[Job]\nif (job != null) {\n    // Safe to use the job\n} else {\n    // Handle the absence of Job appropriately\n}\n```\n\nUsing `coroutineContext.job` is only appropriate when you are certain that a `Job` instance is in the context.",
+        "In Kotlin, the `joinAll` function can be called on two different types:\n\n1. **Vararg Method**: `suspend fun joinAll(vararg jobs: Job)`. You can pass multiple `Job` instances as arguments. This method allows you to join all provided jobs in a single call.\n\n   Example:\n   ```kotlin\n   val job1 = launch { /* some work */ }\n   val job2 = launch { /* some work */ }\n   joinAll(job1, job2)\n   ```\n\n2. **Collection Extension Method**: `suspend fun Collection<Job>.joinAll()`. You can call this method on any collection of `Job` objects, such as a `List` or `Set`.\n\n",
+        "If you have an uncaught exception in a coroutine launched via the `launch` function, by default, that exception will propagate and cancel the parent coroutine (if it exists) and any other coroutines that are part of the same parent job. However, if you specify a `CoroutineExceptionHandler` in the coroutine context, the exception will be handled by that handler instead of canceling the parent job. \n\nTo summarize:\n- **Without `CoroutineExceptionHandler`**: Uncaught exceptions cancel the parent job and propagate upwards.\n- **With `CoroutineExceptionHandler`**: The exception is handled by the specified handler, preventing the cancellation of the parent job.",
+        "The `CoroutineScope.newCoroutineContext` installs `Dispatchers.Default` by default when no other dispatcher or `ContinuationInterceptor` is specified.",
+        "If you attempt to submit a continuation task to a `CloseableCoroutineDispatcher` created by `newFixedThreadPoolContext` after it has been closed:\n\n- **On JVM**: The job of the task being submitted will be canceled, and the task will instead be submitted to `Dispatchers.IO`. This allows the affected coroutine to clean up its resources and complete promptly.\n  \n- **On Native**: An exception is thrown when trying to submit a task to a closed dispatcher. \n\nRemember to manage the lifecycle of the dispatcher properly to avoid unexpected behavior.",
+        "The `newSingleThreadContext` function in Kotlin has the following annotations:\n\n1. `@ExperimentalCoroutinesApi`: Indicates that this API is experimental and may change in future releases.\n2. `@DelicateCoroutinesApi`: Marks the API as delicate, meaning it requires careful usage due to potential risks, especially concerning resource management and thread handling.\n\nMake sure to handle the resulting `CloseableCoroutineDispatcher` properly, as it manages native resources and should be closed when no longer needed."
     ],
     "contexts": [
         [
@@ -50,9 +50,9 @@
             "fun Job.cancel(message: String, cause: Throwable? = null)(source)",
             "Cancels current job, including all its children with a specified diagnostic error message. A cause can be specified to provide additional details on",
             "to provide additional details on a cancellation reason for debugging purposes.",
-            "use the following expression: Executors.newSingleThreadExecutor().asCoroutineDispatcher(). See Executor.asCoroutineDispatcher for details.",
-            "Creates a context for a new coroutine. It installs Dispatchers.Default when no other dispatcher or ContinuationInterceptor is specified and adds",
-            "Completes this deferred value with the value or exception in the given result. Returns true if this deferred was completed as a result of this"
+            "fun CoroutineScope.launch(context: CoroutineContext = EmptyCoroutineContext, start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend",
+            "the original cancellation cause. This function does not do anything if there is no Job in the scope's coroutineContext.",
+            "concurrentjvmnative  \nParameters  \nexpect fun newFixedThreadPoolContext(nThreads: Int, name: String): CloseableCoroutineDispatcher(source)"
         ],
         [
             "completeWith  \nfun <T> CompletableDeferred<T>.completeWith(result: Result<T>): Boolean(source)",
@@ -60,7 +60,7 @@
             "was completed as a result of this invocation and false otherwise (if it was already completed).",
             "Subsequent invocations of this function have no effect and always produce false.",
             "This function transitions this deferred in the same ways described by CompletableDeferred.complete and CompletableDeferred.completeExceptionally.",
-            "function is waiting, this function immediately resumes with CancellationException. There is a prompt cancellation guarantee: even if this function is"
+            "the context does have instance of the job in it."
         ],
         [
             "coroutineScope  \nsuspend fun <R> coroutineScope(block: suspend CoroutineScope.() -> R): R(source)",
@@ -76,9 +76,9 @@
             "The method may throw a CancellationException if the current job was cancelled externally, rethrow the exception thrown by block, or throw an",
             "exception thrown by block, or throw an unhandled Throwable if there is one (for example, from a crashed coroutine that was started with launch in",
             "that was started with launch in this scope).",
-            "Note that delay can be used in select invocation with onTimeout clause.",
-            "This function transitions this deferred in the same ways described by CompletableDeferred.complete and CompletableDeferred.completeExceptionally.",
-            "function is waiting, this function immediately resumes with CancellationException. There is a prompt cancellation guarantee: even if this function is"
+            "newCoroutineContext  \ncommonjsAndWasmSharedjvmnative",
+            "this scope fails, cancelling all the other children (for a different behavior, see supervisorScope). This function returns as soon as the given block",
+            "The scope in this example has the following semantics:  \nshowSomeData returns as soon as the data is loaded and displayed in the UI."
         ],
         [
             "currentCoroutineContext  \ninline suspend fun currentCoroutineContext(): CoroutineContext(source)",
@@ -106,12 +106,12 @@
             "If you want to delay forever (until cancellation), consider using awaitCancellation instead.",
             "Note that delay can be used in select invocation with onTimeout clause.",
             "Implementation note: how exactly time is tracked is an implementation detail of CoroutineDispatcher in the context.",
-            "If the resulting dispatcher is closed and attempt to submit a continuation task is made,",
-            "The scope in this example has the following semantics:  \nshowSomeData returns as soon as the data is loaded and displayed in the UI.",
-            "nThreads  \nthe number of threads.  \nname  \nthe base name of the created threads.",
-            "fun CoroutineScope.cancel(message: String, cause: Throwable? = null)(source)",
             "On the JVM, the Job of the affected task is cancelled and the task is submitted to the Dispatchers.IO, so that the affected coroutine can clean up",
-            "actual fun CoroutineScope.newCoroutineContext(context: CoroutineContext): CoroutineContext(source)  \n@ExperimentalCoroutinesApi"
+            "If you want to delay forever (until cancellation), consider using awaitCancellation instead.",
+            "to limit effective parallelism of the dispatcher, it is recommended to use Dispatchers.IO.limitedParallelism(1) or",
+            "its coroutineContext from the outer scope, using the Job from that context as the parent for a new Job.",
+            "Creates a coroutine execution context with the fixed-size thread-pool and built-in yield support. NOTE: The resulting CoroutineDispatcher owns native",
+            "Creates a coroutine execution context using a single thread with built-in yield support. NOTE: The resulting CloseableCoroutineDispatcher owns native"
         ],
         [
             "ensureActive  \nSee also  \nfun CoroutineScope.ensureActive()(source)  \nEnsures that current scope is active.",
@@ -126,9 +126,9 @@
             "the original cancellation cause. This function does not do anything if there is no Job in the context, since such a coroutine cannot be cancelled.",
             "This method is a drop-in replacement for the following code, but with more precise exception:  \nif (!isActive) { throw CancellationException()}",
             "Content copied to clipboard",
-            "(threads or native workers). It should not be allocated in place, should be closed at the end of its lifecycle, and has non-trivial memory and CPU",
-            "Creates a CoroutineScope and calls the specified suspend block with this scope. The provided scope inherits its coroutineContext from the outer",
-            "concurrentjvmnative  \nParameters  \nexpect fun newFixedThreadPoolContext(nThreads: Int, name: String): CloseableCoroutineDispatcher(source)"
+            "On the JVM, the Job of the affected task is cancelled and the task is submitted to the Dispatchers.IO, so that the affected coroutine can clean up",
+            "If the resulting dispatcher is closed and attempt to submit a task is made, then:",
+            "actual fun CoroutineScope.newCoroutineContext(context: CoroutineContext): CoroutineContext(source)  \n@ExperimentalCoroutinesApi"
         ],
         [
             "ensurePresent  \njvm  \ninline suspend fun ThreadLocal<*>.ensurePresent()(source)",
@@ -136,7 +136,7 @@
             "if it is not. It is a good practice to validate that thread local is present in the context, especially in large code-bases, to avoid stale",
             "in large code-bases, to avoid stale thread-local values and to have a strict invariants.",
             "E.g. one may use the following method to enforce proper use of the thread locals with coroutines:",
-            "Launches a new coroutine without blocking the current thread and returns a reference to the coroutine as a Job. The coroutine is cancelled when the"
+            "that was started with launch in this scope)."
         ],
         [
             "invoke  \ninline suspend operator fun <T> CoroutineDispatcher.invoke(noinline block: suspend CoroutineScope.() -> T): T(source)",
@@ -155,23 +155,23 @@
             "Check this property in long-running computation loops to support cancellation when CoroutineScope.isActive is not available:",
             "while (coroutineContext.isActive) { // do some computation}  \nContent copied to clipboard",
             "Content copied to clipboard  \nThe coroutineContext.isActive expression is a shortcut for get(Job)?.isActive ?: true. See Job.isActive.",
-            "use the following expression: Executors.newSingleThreadExecutor().asCoroutineDispatcher(). See Executor.asCoroutineDispatcher for details.",
-            "start parameter. See CoroutineStart for details. An optional start parameter can be set to CoroutineStart.LAZY to start coroutine lazily. In this",
-            "any uncaught exception leads to the cancellation of the parent coroutine."
+            "This method is a short-cut for coroutineContext[Job]!! and should be used only when it is known in advance that the context does have instance of the",
+            "is specified and adds optional support for debugging facilities (when turned on) and copyable-thread-local facilities on JVM. See DEBUG_PROPERTY_NAME",
+            "This suspending function is cancellable: if the Job of the current coroutine is cancelled while this suspending function is waiting, this function"
         ],
         [
             "isPresent  \njvm  \ninline suspend fun ThreadLocal<*>.isPresent(): Boolean(source)",
             "Return true when current thread local is present in the coroutine context, false otherwise. Thread local can be present in the context only if it was",
             "present in the context only if it was added via asContextElement to the context.",
             "Example of usage:",
-            "timeMillis  \ntime in milliseconds.  \nsuspend fun delay(duration: Duration)(source)"
+            "By default, the coroutine is immediately scheduled for execution. Other start options can be specified via start parameter. See CoroutineStart for"
         ],
         [
             "job  \nval CoroutineContext.job: Job(source)",
             "Retrieves the current Job instance from the given CoroutineContext or throws IllegalStateException if no job is present in the context.",
             "This method is a short-cut for coroutineContext[Job]!! and should be used only when it is known in advance that the context does have instance of the",
             "the context does have instance of the job in it.",
-            "Cancels this scope, including its job and all its children with a specified diagnostic error message. A cause can be specified to provide additional"
+            "completeWith  \nfun <T> CompletableDeferred<T>.completeWith(result: Result<T>): Boolean(source)"
         ],
         [
             "joinAll  \nsuspend fun joinAll(vararg jobs: Job)(source)",
@@ -188,10 +188,10 @@
             "function is waiting, this function immediately resumes with CancellationException. There is a prompt cancellation guarantee: even if this function is",
             "guarantee: even if this function is ready to return the result, but was cancelled while suspended, CancellationException will be thrown. See",
             "will be thrown. See suspendCancellableCoroutine for low-level details.",
-            "will be thrown. See suspendCancellableCoroutine for low-level details.",
-            "The method may throw a CancellationException if the current job was cancelled externally, rethrow the exception thrown by block, or throw an",
-            "Return true when current thread local is present in the coroutine context, false otherwise. Thread local can be present in the context only if it was",
-            "If the outer scope of showSomeData is cancelled, both started async and withContext blocks are cancelled."
+            "Returns true when the Job of the coroutine in this context is still active (has not completed and was not cancelled yet) or the context does not have",
+            "guarantee: even if this function is ready to return the result, but was cancelled while suspended, CancellationException will be thrown. See",
+            "can be specified to provide additional details on a cancellation reason for debugging purposes. Throws IllegalStateException if the scope does not",
+            "joinAll  \nsuspend fun joinAll(vararg jobs: Job)(source)"
         ],
         [
             "launch  \nParameters",
@@ -213,11 +213,11 @@
             "context  \nadditional to CoroutineScope.coroutineContext context of the coroutine.  \nstart",
             "start  \ncoroutine start option. The default value is CoroutineStart.DEFAULT.  \nblock",
             "block  \nthe coroutine code which will be invoked in the context of the provided scope.",
-            "in large code-bases, to avoid stale thread-local values and to have a strict invariants.",
-            "ensureActive  \nSee also  \nfun CoroutineScope.ensureActive()(source)  \nEnsures that current scope is active.",
-            "Calls the specified suspending block with the given CoroutineDispatcher, suspends until it completes, and returns the result.",
-            "function is waiting, this function immediately resumes with CancellationException. There is a prompt cancellation guarantee: even if this function is",
-            "function is waiting, this function immediately resumes with CancellationException. There is a prompt cancellation guarantee: even if this function is"
+            "owns native resources (its thread). Resources are reclaimed by CloseableCoroutineDispatcher.close.",
+            "isActive  \nval CoroutineScope.isActive: Boolean(source)",
+            "use the following expression: Executors.newFixedThreadPool().asCoroutineDispatcher(). See Executor.asCoroutineDispatcher for details.",
+            "name  \nthe base name of the created thread.",
+            "(threads or native workers). It should not be allocated in place, should be closed at the end of its lifecycle, and has non-trivial memory and CPU"
         ],
         [
             "newCoroutineContext  \ncommonjsAndWasmSharedjvmnative",
@@ -230,9 +230,9 @@
             "is specified and adds optional support for debugging facilities (when turned on) and copyable-thread-local facilities on JVM. See DEBUG_PROPERTY_NAME",
             "on JVM. See DEBUG_PROPERTY_NAME for description of debugging facilities on JVM.",
             "actual fun CoroutineScope.newCoroutineContext(context: CoroutineContext): CoroutineContext(source)",
-            "If the job is no longer active, throws CancellationException. If the job was cancelled, thrown exception contains the original cancellation cause.",
-            "Check this property in long-running computation loops to support cancellation when CoroutineScope.isActive is not available:",
-            "This suspending function is cancellable: if the Job of the current coroutine is cancelled while this suspending function is waiting, this function"
+            "is an alias to avoid name clash with CoroutineScope.coroutineContext in a receiver position:",
+            "on JVM. See DEBUG_PROPERTY_NAME for description of debugging facilities on JVM.",
+            "Launches a new coroutine without blocking the current thread and returns a reference to the coroutine as a Job. The coroutine is cancelled when the"
         ],
         [
             "newFixedThreadPoolContext  \nconcurrentjvmnative  \nParameters",
@@ -255,12 +255,12 @@
             "the base name of the created threads.  \nactual fun newFixedThreadPoolContext(nThreads: Int, name: String): CloseableCoroutineDispatcher(source)",
             "@DelicateCoroutinesApi  \nactual fun newFixedThreadPoolContext(nThreads: Int, name: String): CloseableCoroutineDispatcher(source)",
             "@DelicateCoroutinesApi",
-            "is explicitly specified), which means that when launch is used with the context of another coroutine, then any uncaught exception leads to the",
-            "Creates a coroutine execution context with the fixed-size thread-pool and built-in yield support. NOTE: The resulting CoroutineDispatcher owns native",
-            "Cancels Job of this context with an optional cancellation cause. See Job.cancel for details.",
-            "timeMillis  \ntime in milliseconds.  \nsuspend fun delay(duration: Duration)(source)",
-            "This is a delicate API. The result of this method is a closeable resource with the associated native resources (threads or native workers). It should",
-            "This suspending function is cancellable: if the Job of the current coroutine is cancelled while this suspending function is waiting, this function"
+            "and has non-trivial memory and CPU footprint. If you do not need a separate thread pool, but only have to limit effective parallelism of the",
+            "exception thrown by block, or throw an unhandled Throwable if there is one (for example, from a crashed coroutine that was started with launch in",
+            "the affected coroutine can clean up its resources and promptly complete.",
+            "coroutineScope  \nsuspend fun <R> coroutineScope(block: suspend CoroutineScope.() -> R): R(source)",
+            "Dispatchers.IO.limitedParallelism(1) or Dispatchers.Default.limitedParallelism(1) instead.",
+            "Launches a new coroutine without blocking the current thread and returns a reference to the coroutine as a Job. The coroutine is cancelled when the"
         ],
         [
             "newSingleThreadContext  \nconcurrent  \nParameters  \nfun newSingleThreadContext(name: String): CloseableCoroutineDispatcher(source)",
@@ -279,28 +279,28 @@
             "If you need a completely separate thread pool with scheduling policy that is based on the standard JDK executors, use the following expression:",
             "use the following expression: Executors.newSingleThreadExecutor().asCoroutineDispatcher(). See Executor.asCoroutineDispatcher for details.",
             "name  \nthe base name of the created thread.",
-            "is specified and adds optional support for debugging facilities (when turned on) and copyable-thread-local facilities on JVM. See DEBUG_PROPERTY_NAME",
-            "This is a delicate API. The result of this method is a closeable resource with the associated native resources (threads or native workers). It should",
-            "that was started with launch in this scope).",
-            "if the scope does not have a job in it."
+            "This method is a short-cut for coroutineContext[Job]!! and should be used only when it is known in advance that the context does have instance of the",
+            "completeWith  \nfun <T> CompletableDeferred<T>.completeWith(result: Result<T>): Boolean(source)",
+            "Throws IllegalStateException if the scope does not have a job in it.",
+            "Subsequent invocations of this function have no effect and always produce false."
         ]
     ],
     "ground_truth": [
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        ""
+        "CoroutineScope.cancel can take: cause: CancellationException? = null or message: String, cause: Throwable? = null",
+        "Subsequent invocations of this function have no effect and always produce false.",
+        "The provided scope inherits its coroutineContext from the outer scope, using the Job from that context as the parent for a new Job.",
+        "It returns the current CoroutineContext retrieved by using kotlin.coroutines.coroutineContext",
+        "if the Job of the current coroutine is cancelled while this suspending function is waiting, this function immediately resumes with CancellationException. There is a prompt cancellation guarantee: even if this function is ready to return the result, but was cancelled while suspended, CancellationException will be thrown. See suspendCancellableCoroutine for low-level details",
+        "It can be called on Job, CoroutineScope or CoroutineContext",
+        "Checks whether current thread local is present in the coroutine context and throws IllegalStateException if it is not",
+        "Calls the specified suspending block with the given CoroutineDispatcher, suspends until it completes, and returns the result.\n\n",
+        "Yes coroutineContext.isActive expression is a shortcut for get(Job)?.isActive ?: true",
+        "It returns true when current thread local is present in the coroutine context, false otherwise",
+        "No, it should be used only when it is known in advance that the context does have instance of the job in it.",
+        "It can be called with vararg jobs: Job or on Collection<Job>.joinAll()",
+        "Uncaught exceptions in this coroutine cancel the parent job in the context by default (unless CoroutineExceptionHandler is explicitly specified), which means that when launch is used with the context of another coroutine, then any uncaught exception leads to the cancellation of the parent coroutine.",
+        "It installs Dispatchers.Default when no other dispatcher or ContinuationInterceptor is specified",
+        "If the resulting dispatcher is closed and attempt to submit a continuation task is made,\n\nOn the JVM, the Job of the affected task is cancelled and the task is submitted to the Dispatchers.IO, so that the affected coroutine can clean up its resources and promptly complete.\n\nOn Native, the attempt to submit a task throws an exception.",
+        "@ExperimentalCoroutinesApia and @DelicateCoroutinesApi"
     ]
 }
