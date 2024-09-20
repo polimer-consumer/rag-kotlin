@@ -22,7 +22,7 @@ def extract_table_row_links(soup, base_url):
             links.add(full_url)
     return links
 
-
+"""
 with open('../data/extracted_links.txt', 'r', encoding='utf-8') as file:
     initial_links = {line.strip() for line in file}
 
@@ -45,3 +45,4 @@ with open('../data/table_row_links.txt', 'w', encoding='utf-8') as file:
         file.write(link + '\n')
 
 print("Links inside 'table-row' divs have been saved to table_row_links.txt")
+"""

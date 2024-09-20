@@ -32,7 +32,7 @@ except Exception as e:
 initial_links = lines
 
 # Uncomment when will need to parse everything
-# with open('../data/table_row_links.txt', 'r', encoding='utf-8') as file:
+#with open('../data/table_row_links.txt', 'r', encoding='utf-8') as file:
 #     initial_links = {line.strip() for line in file}
 
 for link in initial_links:
@@ -81,5 +81,5 @@ for link in initial_links:
                 metadata = {"Topic": link}
             splits_list.append({"chunk": split.page_content, "metadata": metadata})
 
-with open('../data/splits.json', 'w', encoding='utf-8') as file:
+with open('../data/splits_all1.json', 'w', encoding='utf-8') as file:
     json.dump(splits_list, file)
