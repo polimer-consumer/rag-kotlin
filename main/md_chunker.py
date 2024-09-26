@@ -96,24 +96,3 @@ def write_docs_to_json(docs, json_file=None):
 
     with open(json_file, 'w', encoding='utf-8') as file:
         json.dump(existing_data, file, ensure_ascii=False, indent=4)
-
-'''
-def save_vectors_to_file(vectors, metadata, file_path=None):
-    if file_path is None:
-        file_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'vectors.json')
-
-    if os.path.exists(file_path):
-        with open(file_path, 'r+', encoding='utf-8') as file:
-            try:
-                existing_data = json.load(file)
-            except json.JSONDecodeError:
-                existing_data = []
-            data = existing_data + [{"embedding": vector, "metadata": meta} for vector, meta in zip(vectors, metadata)]
-            file.seek(0)
-            json.dump(data, file, ensure_ascii=False, indent=4)
-            file.truncate()
-    else:
-        with open(file_path, 'w', encoding='utf-8') as file:
-            data = [{"embedding": vector, "metadata": meta} for vector, meta in zip(vectors, metadata)]
-            json.dump(data, file, ensure_ascii=False, indent=4)
-'''

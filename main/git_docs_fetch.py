@@ -40,11 +40,3 @@ def get_documentation_directory(docs_url, destination_dir):
         print(f': {e}')
 
 
-#Example:
-'''
-documentation_url = 'https://api.github.com/repos/Kotlin/kotlinx.serialization/contents/docs'
-destination = '../data/kotlinx_serialisation_local'
-
-get_documentation_directory(documentation_url, destination)
-'''
-

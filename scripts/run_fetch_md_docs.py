@@ -1,5 +1,8 @@
 import os
 import argparse
+import sys
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from main.fetch_md_docs import process_github_repo
 
@@ -13,7 +16,6 @@ def main(file_path, d):
 
 
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser()
 
     default_input_file = os.path.join(os.path.dirname(__file__), '..', 'data', 'md_docs_links.txt')
